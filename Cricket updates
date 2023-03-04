@@ -1,0 +1,48 @@
+import requests
+
+from bs4 import BeautifulSoup
+
+import telegram
+
+from telegram.ext import Updater, CommandHandler
+
+# Replace YOUR_API_KEY with your Telegram bot API key
+
+bot = telegram.Bot(token='5990961816:AAHdsGDCfyX9y5USGcdCMgY4XycfpTc2CcY')
+
+def start(update, context):
+
+    update.message.reply_text('Welcome to Cricket Updates Bot! Type /score to get the live cricket score.')
+
+def score(update, context):
+
+    url = 'https://www.espncricinfo.com/'
+
+    response = requests.get(url)
+
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    scorecard = soup.find_all('div', class_='scorecard-container')
+
+    if scorecard:
+
+        score = scorecard[0].text.strip()
+
+        update.message.reply_text(score)
+
+    else:
+
+        update.message.reply_text('Sorry, no live cricket score available at the moment.')
+
+# Replace YOUR_TELEGRAM_CHAT_ID with your Telegram chat ID
+
+updater = Updater(token='1476151678', use_context=True)
+
+updater.dispatcher.add_handler(CommandHandler('start', start))
+
+updater.dispatcher.add_handler(CommandHandler('score', score))
+
+updater.start_polling()
+
+updater.idle()
+
